@@ -22,6 +22,7 @@
                             </tr>
                             </thead>
                             <tbody>
+                            @if($myposts->count() > 0)
                             @foreach($myposts as $mp)
                             <tr>
                                 <th scope="row">{{$mp->id}}</th>
@@ -38,6 +39,11 @@
                                 </td>
                             </tr>
                             @endforeach
+                            @else
+                                <tr>
+                                   <td colspan="5" class="text-center">No tienes ninguna publicación</td>
+                                </tr>
+                            @endif
                             </tbody>
                         </table>
                     </div>

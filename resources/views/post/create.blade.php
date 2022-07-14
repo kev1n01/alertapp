@@ -11,7 +11,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form method="POST" class="row g-3" action="{{route('post.store')}}">
+                        <form method="POST" class="row g-3" action="{{route('post.store')}}" enctype="multipart/form-data">
                             @csrf
                             <div class="col-md-6">
                                 <label for="titulo" class="form-label">Titulo</label>

@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
              'name' => 'admin',
              'email' => 'admin@alerta.com',
          ]);
+
+        \App\Models\Category::create([
+            'nombre' => 'asesinato',
+        ]);
     }
 }

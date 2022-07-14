@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -36,16 +37,37 @@ class PostController extends Controller
         return view('post.edit',compact('post','categorias'));
     }
 
-    public function store(Request $request){
+    public function store(Request $request,$id=null){
         $validated = $request->validate([
-            'titulo' => 'required|unique:posts|max:50|min:10',
+            'titulo' => 'required|max:50|min:10',
             'ubicacion' => 'required|max:30|min:5',
             'category_id' => 'required',
-            'multimedia' => 'required',
+            'multimedia' => 'nullable',
         ]);
-        $validated['user_id'] = Auth::user()->id; //agregando el valor del id del usuario autenticado a la validacion
-//        dd($validated);
-        Post::updateOrCreate($validated);
+
+        if($id != null){ //quiere decir para update
+            $post = Post::find($id);
+            if($validated['multimedia']){
+                $this->removeImage($post->multimedia);
+            }
+
+            if(isset($validated['multimedia'])){
+                $validated['multimedia'] = $nombrearchivo = str_replace(" ","",$validated['titulo'])."_".time().".".$validated['multimedia']->extension();
+                $request->multimedia->move(public_path('img/post'),$nombrearchivo);
+            }
+            $validated['user_id'] = Auth::user()->id; //agregando el valor del id del usuario autenticado a la validacion
+
+            $post->update($validated);
+        }else{
+            if(isset($validated['multimedia'])){
+                $validated['multimedia'] = $nombrearchivo = str_replace(" ","",$validated['titulo'])."_".time().".".$validated['multimedia']->extension();
+                $request->multimedia->move(public_path('img/post'),$nombrearchivo);
+            }
+            $validated['user_id'] = Auth::user()->id; //agregando el valor del id del usuario autenticado a la validacion
+
+            Post::create($validated);
+        }
+
         return redirect()->route('post.my-posts');
     }
     public function create(){
@@ -53,12 +75,24 @@ class PostController extends Controller
 //        dd($categorias);
         return view('post.create',compact('categorias'));
     }
-    public function delete(Post $post){
+    public function delete($id){
+        $post = Post::find($id);
         $post->delete();
         return redirect()->route('post.my-posts');
     }
     public function adminpost(){
         $allposts = Post::all();
         return view('post.admin.index',compact('allposts'));
+    }
+
+
+    public function removeImage($image){
+        if(!$image){
+            return ;
+        }
+
+        if(Storage::disk('public')->exists($image)){
+            Storage::disk('public')->delete($image);
+        }
     }
 }
