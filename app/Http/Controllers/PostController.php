@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -17,7 +16,7 @@ class PostController extends Controller
         $this->middleware('auth')->only(['edit','myposts','create','adminpost','delete']);
     }
     public function index(){
-        $posts = Post::all();
+        $posts = Post::withCount(['commentary'])->get();
         return view('post.index',compact('posts'));
 
     }
@@ -36,39 +35,52 @@ class PostController extends Controller
         $categorias = Category::all();
         return view('post.edit',compact('post','categorias'));
     }
-
-    public function store(Request $request,$id=null){
+    
+    public function store(Request $request){
         $validated = $request->validate([
-            'titulo' => 'required|max:50|min:10',
-            'ubicacion' => 'required|max:30|min:5',
+            'titulo' => 'required|max:50|min:5',
+            'ubicacion' => 'required|max:50|min:5',
+            'descripcion' => 'required|max:100|min:5',
             'category_id' => 'required',
-            'multimedia' => 'nullable',
+            'multimedia' => 'required',
+        ]);
+        
+        if(isset($validated['multimedia'])){            
+            $validated['multimedia'] = $nombrearchivo = str_replace(" ","",$validated['titulo'])."_".time().".".$validated['multimedia']->extension();
+            $request->multimedia->move(public_path('img/post'),$nombrearchivo);
+        }
+        $validated['user_id'] = Auth::user()->id; //agregando el valor del id del usuario autenticado a la validacion
+        Post::create($validated);
+        return redirect()->route('post.my-posts')->with('success','Publicación creado con exito');;
+    }
+    public function update(Request $request,$id){
+        $postfind = Post::find($id);
+        // dd($post);
+        $validated = $request->validate([
+            'titulo' => 'required|max:50|min:5',
+            'ubicacion' => 'required|max:50|min:5',
+            'descripcion' => 'required|max:100|min:5',
+            'category_id' => 'required',
+            'multimedia' => 'required',
         ]);
 
-        if($id != null){ //quiere decir para update
-            $post = Post::find($id);
-            if($validated['multimedia']){
-                $this->removeImage($post->multimedia);
-            }
-
-            if(isset($validated['multimedia'])){
-                $validated['multimedia'] = $nombrearchivo = str_replace(" ","",$validated['titulo'])."_".time().".".$validated['multimedia']->extension();
-                $request->multimedia->move(public_path('img/post'),$nombrearchivo);
-            }
-            $validated['user_id'] = Auth::user()->id; //agregando el valor del id del usuario autenticado a la validacion
-
-            $post->update($validated);
-        }else{
-            if(isset($validated['multimedia'])){
-                $validated['multimedia'] = $nombrearchivo = str_replace(" ","",$validated['titulo'])."_".time().".".$validated['multimedia']->extension();
-                $request->multimedia->move(public_path('img/post'),$nombrearchivo);
-            }
-            $validated['user_id'] = Auth::user()->id; //agregando el valor del id del usuario autenticado a la validacion
-
-            Post::create($validated);
+        if(isset($validated['multimedia'])){            
+            $validated['multimedia'] = $nombrearchivo = str_replace(" ","",$validated['titulo'])."_".time().".".$validated['multimedia']->extension();
+            $request->multimedia->move(public_path('img/post'),$nombrearchivo);
         }
 
-        return redirect()->route('post.my-posts');
+        $postfind->update([
+            'titulo' => $validated['titulo'],
+            'ubicacion' => $validated['ubicacion'],
+            'descripcion' => $validated['descripcion'],
+            'category_id' => $validated['category_id'],
+            'multimedia' => $validated['multimedia'],
+            'user_id' => Auth::user()->id,
+        ]);
+      
+
+        return redirect()->route('post.my-posts')->with('success','Publicación actualizado con exito');
+
     }
     public function create(){
         $categorias = Category::all();
@@ -77,8 +89,9 @@ class PostController extends Controller
     }
     public function delete($id){
         $post = Post::find($id);
+        $post->commentary()->delete();//elimina primeros los comentarios relacionados al post
         $post->delete();
-        return redirect()->route('post.my-posts');
+        return redirect()->route('post.my-posts')->with('success','EL post se eliminó con exito');
     }
     public function adminpost(){
         $allposts = Post::all();

@@ -14,15 +14,47 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        
+        \App\Models\User::factory()->create([
+            'name' => 'El admin',
+            'email' => 'admin@alerta.com',
+        ]);
 
-         \App\Models\User::factory()->create([
-             'name' => 'admin',
-             'email' => 'admin@alerta.com',
-         ]);
+        \App\Models\User::factory(2)->create();
 
-        \App\Models\Category::create([
-            'nombre' => 'asesinato',
+        $categories = [
+            'asesinato',
+            'robo',
+            'secuestro',
+            'violación',
+            'extorción',
+            'cobro de cupos',
+        ];
+
+        foreach($categories as $c){
+            \App\Models\Category::create([
+                'nombre' => $c,
+            ]);
+        }
+
+        \App\Models\Post::create([
+            'titulo' => 'Robo de moto de huallayco',
+            'user_id' => 1,
+            'category_id'=> 2,
+            'ubicacion' => 'Jr. Huallayco 12342',
+            'descripcion' => 'me robaron mi moto color roja',
+        ]);
+
+        \App\Models\Commentary::create([
+            'mensaje' => 'gracias por la informacion estimado',
+            'user_id' => 3,
+            'post_id' => 1,
+        ]);
+
+        \App\Models\Commentary::create([
+            'mensaje' => 'tendre precaucion, gracias uwu',
+            'user_id' => 2,
+            'post_id' => 1,
         ]);
     }
 }

@@ -11,7 +11,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form method="POST" class="row g-3" action="{{route('post.store',$post->id)}}" enctype="multipart/form-data">
+                        <form method="POST" class="row g-3" action="{{route('post.update',$post->id)}}" enctype="multipart/form-data">
                             @csrf
                             <div class="col-md-6">
                                 <label for="titulo" class="form-label">Titulo</label>
@@ -38,7 +38,7 @@
                                 <select id="category_id" class="form-select {{$errors->has('category_id') ? 'is-invalid':''}}" name="category_id">
                                     <option >Elegir...</option>
                                     @foreach($categorias as $cat)
-                                        <option value="{{$cat->id}}" {{$post->category_id ? 'selected' : ''}}>{{$cat->nombre}}</option>
+                                        <option value="{{$cat->id}}" {{$post->category_id == $cat->id ? 'selected' : '' }}>{{$cat->nombre}}</option>
                                     @endforeach
                                 </select>
                                 @if($errors->has('category_id'))

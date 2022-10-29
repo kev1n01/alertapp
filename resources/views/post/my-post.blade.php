@@ -5,13 +5,21 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
+                @if (session('success'))
+                <div class="alert alert-success alert-dismissible d-flex align-items-center fade show " role="alert">
+                    <div>
+                        {{ session('success') }}
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <a class="btn btn-dark" href="{{route('post.create')}}">+ Crear Publicación</a>
                     </div>
 
                     <div class="card-body">
-                        <table class="table">
+                        <table id="myposttable" class="table">
                             <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -52,3 +60,10 @@
         </div>
     </div>
 @endsection
+    @section('scripts')
+    <script>
+        $(document).ready(function(){
+            $('#myposttable').DataTable();
+        });
+    </script>
+    @endsection

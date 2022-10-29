@@ -34,7 +34,16 @@
                                     </span>
                                 @endif
                             </div>
-
+                            <div class="col-md-12">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control {{$errors->has('descripcion') ? 'is-invalid':''}}" id="descripcion" 
+                                    name="descripcion" value="{{ old('descripcion','') }}" aria-label="With textarea"></textarea>
+                                @if ($errors->has('descripcion'))
+                                    <span class="text-danger">
+                                        <strong>{{$errors->first('descripcion')}}</strong>
+                                    </span>
+                                @endif
+                            </div>
                             <div class="col-md-4">
                                 <label for="category_id" class="form-label">Categoría de delito</label>
                                 <select id="category_id" class="form-select {{$errors->has('category_id') ? 'is-invalid':''}}" name="category_id">

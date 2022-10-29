@@ -14,6 +14,7 @@ class Post extends Model
         'user_id',
         'category_id',
         'ubicacion',
+        'descripcion',
     ];
     public function commentary(){
         return $this->hasMany(Commentary::class);

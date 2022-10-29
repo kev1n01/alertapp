@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\CommentaryController;
+use App\Http\Controllers\PostController;
+use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,12 +24,22 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/publicaciones', [App\Http\Controllers\PostController::class, 'index'])->name('post.index');
 
-Route::post('/storepost', [App\Http\Controllers\PostController::class, 'store'])->name('post.store');
-Route::get('/delete/{id}', [App\Http\Controllers\PostController::class, 'delete'])->name('post.delete');
-Route::get('/crear-publicacion', [App\Http\Controllers\PostController::class, 'create'])->name('post.create');
-Route::get('/editar-publicacion/{id}', [App\Http\Controllers\PostController::class, 'edit'])->name('post.edit');
-Route::get('/ver-publicacion/{titulo}', [App\Http\Controllers\PostController::class, 'show'])->name('post.show');
-Route::get('/mis-publicaciones', [App\Http\Controllers\PostController::class, 'myposts'])->name('post.my-posts');
-Route::get('/admin-publicaciones', [App\Http\Controllers\PostController::class, 'adminpost'])->name('post.admin.index');
+Route::controller(PostController::class)->prefix('post')->group(function(){
+    Route::get('/publicaciones', 'index')->name('post.index');
+    Route::post('/storepost', 'store')->name('post.store');
+    Route::post('/update/{id}', 'update')->name('post.update');
+    Route::get('/delete/{id}', 'delete')->name('post.delete');
+    Route::get('/crear-publicacion', 'create')->name('post.create');
+    Route::get('/editar-publicacion/{id}', 'edit')->name('post.edit');
+    Route::get('/ver-publicacion/{titulo}','show')->name('post.show');
+    Route::get('/mis-publicaciones', 'myposts')->name('post.my-posts');
+    Route::get('/admin-publicaciones', 'adminpost')->name('post.admin.index');
+});
+
+Route::post('/storecommentary',[CommentaryController::class,'store'])->name('commentary.store');
+
+Route::controller(Category::class)->prefix('category')->group(function(){
+    Route::get('/categories','index')->name('category.index');
+    Route::get('/store','store')->name('category.index');
+});

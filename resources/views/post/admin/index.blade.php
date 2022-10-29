@@ -11,10 +11,10 @@
                     </div>
 
                     <div class="card-body">
-                        <table class="table">
+                        <table id="adminpost" class="table">
                             <thead>
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col">Usuario</th>
                                 <th scope="col">Titulo</th>
                                 <th scope="col">Ubicación</th>
                                 <th scope="col">Categoría</th>
@@ -25,7 +25,7 @@
                             @if($allposts->count() > 0)
                             @foreach($allposts as $mp)
                                 <tr>
-                                    <th scope="row">{{$mp->id}}</th>
+                                    <th>{{$mp->user->name}}</th>
                                     <td>{{$mp->titulo}}</td>
                                     <td>{{$mp->ubicacion}}</td>
                                     <td>{{$mp->category->nombre}}</td>
@@ -51,4 +51,11 @@
             </div>
         </div>
     </div>
+@endsection
+@section('scripts')
+<script>
+    $(document).ready(function(){
+        $('#adminpost').DataTable();
+    });
+</script>
 @endsection

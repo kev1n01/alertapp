@@ -11,6 +11,7 @@ class Category extends Model
     protected $fillable = [
         'nombre',
     ];
+    
     public function posts(){
         return $this->hasOne(Post::class);
     }
